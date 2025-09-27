@@ -1,16 +1,13 @@
 FROM ubuntu:22.04
 
-ARG UBUNTU_MIRROR=http://ports.ubuntu.com/ubuntu-ports/
-ENV UBUNTU_DIST=jammy
-
 # This prevents questions during package installations
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 TZ=America/New_York
 
-RUN echo deb ${UBUNTU_MIRROR} ${UBUNTU_DIST} main restricted universe multiverse > /etc/apt/sources.list && \
-    echo deb ${UBUNTU_MIRROR} ${UBUNTU_DIST}-updates main restricted universe multiverse >> /etc/apt/sources.list && \
-    echo deb ${UBUNTU_MIRROR} ${UBUNTU_DIST}-backports main restricted universe multiverse >> /etc/apt/sources.list && \
-    echo deb ${UBUNTU_MIRROR} ${UBUNTU_DIST}-security main restricted universe multiverse >> /etc/apt/sources.list && \
+RUN echo deb http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse > /etc/apt/sources.list && \
+    echo deb http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse >> /etc/apt/sources.list && \
+    echo deb http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse >> /etc/apt/sources.list && \
+    echo deb http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse >> /etc/apt/sources.list && \
     apt-get update -q && \
     apt-get install -qy \
         git \
