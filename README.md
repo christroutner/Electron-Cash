@@ -6,6 +6,8 @@ This new README contains step-by-step instructions for install Electron Cash on 
 
 This guide provides step-by-step instructions for building Electron Cash from source on Ubuntu 22.04 running on Raspberry Pi (ARM64 architecture).
 
+These steps have been tested on a Raspberry Pi 4 B with 4GB of memory and a 32GB SD card. *These should be considered minimal requirements*.
+
 ## Prerequisites and System Setup
 
 ### 1. Update System
