@@ -168,3 +168,7 @@ chmod +x electron-cash
 # Install system-wide (optional)
 sudo python3 setup.py install
 ```
+### 17. Install Tor for use with Cash Fusion
+```bash
+sudo apt install tor
+```
