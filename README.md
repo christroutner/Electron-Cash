@@ -67,7 +67,6 @@ sudo apt install -y \
     qttools5-dev \
     qttools5-dev-tools \
     libqt5svg5-dev \
-    libqt5multimedia5-dev \
     python3-sip-dev \
     python3-sip
 ```
@@ -76,7 +75,7 @@ sudo apt install -y \
 
 ### 5. Clone Repository and Initialize Submodules
 ```bash
-git clone https://github.com/Electron-Cash/Electron-Cash.git
+git clone https://github.com/christroutner/Electron-Cash
 cd Electron-Cash
 git submodule update --init --recursive
 ```
@@ -101,6 +100,7 @@ pip3 install --user pycryptodomex psutil cryptography
 
 ### 9. Install Hardware Wallet Support (Optional)
 ```bash
+sudo apt-get install swig libpcsclite-dev
 pip3 install --user -r contrib/requirements/requirements-hw.txt
 ```
 
@@ -119,8 +119,6 @@ pip3 install --user zxing-cpp>=2.3.0
 ```bash
 # If you encounter libtool issues, clean and rebuild
 cd contrib/secp256k1
-make clean
-make distclean
 ./autogen.sh
 cd ../..
 
@@ -135,6 +133,7 @@ cd ../..
 
 ### 12. Build ZBar for QR Scanning (Alternative to zxing-cpp)
 ```bash
+sudo apt install autopoint libtool-bin
 ./contrib/make_zbar
 ```
 
@@ -169,83 +168,3 @@ chmod +x electron-cash
 # Install system-wide (optional)
 sudo python3 setup.py install
 ```
-
-## Troubleshooting Guide
-
-### Common Issues and Solutions
-
-**Issue 1: PyQt5 Import Error with Segmentation Fault**
-- **Solution**: Use system PyQt5 packages instead of pip packages
-- **Command**: `sudo apt install python3-pyqt5 python3-pyqt5.qtsvg`
-
-**Issue 2: libsecp256k1 Build Fails with libtool Error**
-- **Solution**: Clean and regenerate build files
-- **Commands**: 
-  ```bash
-  cd contrib/secp256k1
-  make clean && make distclean
-  ./autogen.sh
-  cd ../..
-  ./contrib/make_secp
-  ```
-
-**Issue 3: zxing-cpp Build Fails**
-- **Solution**: Install cmake and build tools, or skip QR scanning
-- **Commands**: 
-  ```bash
-  sudo apt install cmake build-essential libopencv-dev
-  pip3 install zxing-cpp
-  ```
-
-**Issue 4: Virtual Environment Conflicts**
-- **Solution**: Use system packages or create venv with `--system-site-packages`
-- **Command**: `python3 -m venv --system-site-packages myenv`
-
-### Alternative Installation Methods
-
-**Method A: No Virtual Environment (Recommended for Raspberry Pi)**
-```bash
-# Install everything system-wide
-sudo apt install python3-pyqt5 python3-pyqt5.qtsvg
-pip3 install --user -r contrib/requirements/requirements.txt
-python3 ./electron-cash
-```
-
-**Method B: Virtual Environment with System Packages**
-```bash
-# Create venv that can access system packages
-python3 -m venv --system-site-packages electroncash-env
-source electroncash-env/bin/activate
-pip install -r contrib/requirements/requirements.txt
-./electron-cash
-```
-
-## Verification Steps
-
-### 17. Verify Installation
-```bash
-# Check PyQt5 availability
-python3 -c "from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg; print('PyQt5 OK')"
-
-# Check Electron Cash startup
-python3 ./electron-cash --version
-
-# Test GUI launch
-python3 ./electron-cash
-```
-
-### 18. Optional: Hardware Wallet Setup
-If using Ledger Nano S:
-```bash
-pip3 install --user btchip-python
-```
-
-## Important Notes
-
-- **Raspberry Pi Specific**: Always use system PyQt5 packages rather than building from source
-- **Performance**: Building libsecp256k1 is highly recommended for better performance
-- **QR Scanning**: If zxing-cpp fails, ZBar provides alternative QR scanning
-- **Memory**: Raspberry Pi may need swap space for large builds
-- **GUI**: If GUI fails, command-line mode (`./electron-cash daemon start`) will work
-
-This guide incorporates fixes for common Raspberry Pi build issues and should work reliably on Ubuntu 22.04 on ARM64 architecture.
