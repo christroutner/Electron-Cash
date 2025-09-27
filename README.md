@@ -172,3 +172,7 @@ sudo python3 setup.py install
 ```bash
 sudo apt install tor
 ```
+
+## Build AppImage
+
+To build a distributable AppImage for arm64 architecture (Raspberry Pi), see the [AppImage README](./contrib/build-linux/README.md).

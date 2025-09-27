@@ -4,8 +4,6 @@ This guide provides instructions for building an AppImage of Electron Cash speci
 
 ⚠️ **Prerequisites**: This guide assumes you have already successfully installed and run Electron Cash on your Raspberry Pi following the main README instructions. All required dependencies should already be installed.
 
-✓ _This binary is reproducible: you should be able to generate binaries that match the official releases (i.e. with the same sha256 hash)._
-
 ## Overview
 
 The standard AppImage build system is designed for x86_64 architecture. Building for ARM64 requires creating ARM64-specific build files and modifying the build process.
