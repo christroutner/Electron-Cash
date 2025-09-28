@@ -19,7 +19,7 @@ git config --global --add safe.directory $(readlink -f "$PROJECT_ROOT")
 . "$CONTRIB"/base.sh
 
 # pinned versions
-PKG2APPIMAGE_COMMIT="eb8f3acdd9f11ab19b78f5cb15daa772367daf15"
+PKG2APPIMAGE_COMMIT="master"  # or use a specific newer commit
 
 VERSION=`git_describe_filtered`
 APPIMAGE="$DISTDIR/Electron-Cash-$VERSION-aarch64.AppImage"
@@ -102,6 +102,12 @@ info "Finalizing AppDir"
     delete_blacklisted
     mv usr/include.tmp usr/include
 ) || fail "Could not finalize AppDir"
+
+# Add this before the finalization step
+info "Detected architecture: $(uname -m)"
+info "Setting ARCH to aarch64"
+export ARCH=aarch64
+info "ARCH is now: $ARCH"
 
 # Copy ARM64-specific libraries
 info "Copying additional libraries for ARM64"
