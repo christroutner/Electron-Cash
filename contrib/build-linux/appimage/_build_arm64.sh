@@ -197,9 +197,10 @@ info "Creating the AppImage"
     # We build a small wrapper for mksquashfs that removes the -mkfs-fixed-time option
     cat > ./squashfs-root/usr/lib/appimagekit/mksquashfs << 'SQUASHFS_EOF'
 #!/bin/sh
-args=\$(echo "\$@" | sed -e 's/-mkfs-fixed-time 0//')
-mksquashfs \$args
+args=$(echo "$@" | sed -e 's/-mkfs-fixed-time 0//')
+mksquashfs $args
 SQUASHFS_EOF
+    chmod +x ./squashfs-root/usr/lib/appimagekit/mksquashfs
     env VERSION="$VERSION" ARCH=aarch64 SOURCE_DATE_EPOCH=1530212462 \
                 ./squashfs-root/AppRun --no-appstream --verbose "$APPDIR" "$APPIMAGE" \
                 || fail "AppRun failed"
