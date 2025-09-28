@@ -81,7 +81,7 @@ cp -fp "$PROJECT_ROOT/icons/electron-cash.png" "$APPDIR/electron-cash.png"
 
 # Add launcher
 info "Adding launcher"
-cp -fp "$CONTRIB/build-linux/appimage/scripts/common_arm64.sh" "$APPDIR/common.sh" || fail "Could not copy python script"
+cp -fp "$CONTRIB/build-linux/appimage/common_arm64.sh" "$APPDIR/common.sh" || fail "Could not copy python script"
 cp -fp "$CONTRIB/build-linux/appimage/scripts/apprun.sh" "$APPDIR/AppRun" || fail "Could not copy AppRun script"
 cp -fp "$CONTRIB/build-linux/appimage/scripts/python.sh" "$APPDIR/python" || fail "Could not copy python script"
 
