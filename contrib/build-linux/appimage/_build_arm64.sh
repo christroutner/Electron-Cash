@@ -88,6 +88,7 @@ cp -fp "$CONTRIB/build-linux/appimage/scripts/python.sh" "$APPDIR/python" || fai
 info "Finalizing AppDir"
 (
     export PKG2AICOMMIT="$PKG2APPIMAGE_COMMIT"
+    export ARCH=aarch64  # Add this line to explicitly set the architecture
     . "$CACHEDIR/functions.sh"
 
     cd "$APPDIR"
