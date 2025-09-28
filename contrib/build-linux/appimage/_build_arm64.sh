@@ -56,7 +56,6 @@ tar xf "$CACHEDIR/Python-$PYTHON_VERSION.tar.xz" -C "$BUILDDIR"
     ./configure --prefix="$APPDIR/usr" --disable-shared --disable-ipv6 --enable-optimizations --with-lto --enable-loadable-sqlite-extensions
     make -j$WORKER_COUNT
     make install
-    popd
 )
 
 python="$APPDIR/usr/bin/python3.11"

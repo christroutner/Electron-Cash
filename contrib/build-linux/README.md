@@ -4,14 +4,36 @@ This guide provides instructions for building an AppImage of Electron Cash speci
 
 ⚠️ **Prerequisites**: This guide assumes you have already successfully installed and run Electron Cash on your Raspberry Pi following the main README instructions. All required dependencies should already be installed.
 
+## Overview
 
-## Build the AppImage
+The standard AppImage build system is designed for x86_64 architecture. Building for ARM64 requires creating ARM64-specific build files and modifying the build process.
+
+## Step 1: Install Docker (if not already installed)
+
+Since you already have Electron Cash running, Docker might not be installed. Install it now:
+
+```bash
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Add your user to the docker group
+sudo usermod -aG docker $USER
+
+# Log out and log back in, or run:
+newgrp docker
+
+# Verify Docker installation
+docker --version
+```
+
+## Step 2: Build the AppImage
 
 Now you can build the AppImage for ARM64:
 
 ```bash
 # Build the AppImage (replace 'master' with your desired tag/branch)
-./contrib/build-linux/appimage/build_arm64.sh master
+CPU_COUNT=2 ./contrib/build-linux/appimage/build_arm64.sh master
 ```
 
 ## Step 4: Test the AppImage
@@ -75,3 +97,41 @@ Execute the binary as follows: `./Electron-Cash*.AppImage --appimage-extract`
 
 ### Can I build for other ARM64 systems?
 Yes, the resulting AppImage should work on any ARM64 Linux system, not just Raspberry Pi.
+
+### Solution 3: Reduce Parallel Build Jobs
+
+You can reduce the number of parallel compilation jobs by setting the `CPU_COUNT` environment variable before running the build:
+
+```bash
+# Reduce to 2 parallel jobs instead of using all CPU cores + 1
+CPU_COUNT=2 ./contrib/build-linux/appimage/build_arm64.sh master
+```
+
+Or even more conservative:
+```bash
+# Use only 1 parallel job
+CPU_COUNT=1 ./contrib/build-linux/appimage/build_arm64.sh master
+```
+
+### Solution 4: Disable LTO/PGO (Advanced)
+
+If you need to modify the build script itself, you could disable LTO and PGO, but this would require editing the Python build configuration, which is more complex.
+
+## Recommended Approach
+
+1. **First, try increasing Docker memory to 8GB or more**
+2. **If that doesn't work, try reducing parallel jobs:**
+   ```bash
+   CPU_COUNT=2 ./contrib/build-linux/appimage/build_arm64.sh master
+   ```
+3. **If still failing, use single-threaded build:**
+   ```bash
+   CPU_COUNT=1 ./contrib/build-linux/appimage/build_arm64.sh master
+   ```
+
+The memory issue is particularly common on ARM64 builds because:
+- Python compilation is memory-intensive
+- LTO and PGO significantly increase memory usage
+- ARM64 builds may have different memory allocation patterns
+
+Try the Docker memory increase first, as it's the least invasive solution.
