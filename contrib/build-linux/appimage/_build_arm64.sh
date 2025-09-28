@@ -31,33 +31,24 @@ info "downloading some dependencies."
 download_if_not_exist "$CACHEDIR/functions.sh" "https://raw.githubusercontent.com/AppImage/pkg2appimage/$PKG2APPIMAGE_COMMIT/functions.sh"
 verify_hash "$CACHEDIR/functions.sh" "78b7ee5a04ffb84ee1c93f0cb2900123773bc6709e5d1e43c37519f590f86918"
 
-# Create a patched version of functions.sh with ARM64 support
-info "Creating ARM64-compatible functions.sh"
-cat > "$CACHEDIR/functions_arm64.sh" << 'FUNCTIONS_EOF'
-#!/bin/bash
-# ARM64-compatible version of functions.sh
-
-# Source the original functions.sh but override architecture detection
-source "$CACHEDIR/functions.sh.backup" 2>/dev/null || source "$CACHEDIR/functions.sh"
-
-# Override architecture detection for ARM64
-if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then
-    SYSTEM_ARCH="aarch64"
-    ARCH="aarch64"
-fi
-
-# Override any architecture-dependent functions if needed
-if [ "$SYSTEM_ARCH" = "aarch64" ]; then
-    # Add any ARM64-specific overrides here
-    true
-fi
-FUNCTIONS_EOF
-
-# Create backup of original functions.sh
+# Patch functions.sh to add ARM64 support
+info "Patching functions.sh for ARM64 support"
+# Create a backup
 cp "$CACHEDIR/functions.sh" "$CACHEDIR/functions.sh.backup"
 
-# Replace functions.sh with our ARM64-compatible version
-mv "$CACHEDIR/functions_arm64.sh" "$CACHEDIR/functions.sh"
+# Simple sed-based patch to add ARM64 support
+sed -i '/x86_64|amd64)/a\      aarch64|arm64)\n        SYSTEM_ARCH="aarch64";;' "$CACHEDIR/functions.sh"
+sed -i '/i?86)/a\      aarch64|arm64)\n        SYSTEM_ARCH="aarch64";;' "$CACHEDIR/functions.sh"
+
+# Also patch the nested case statement
+sed -i '/unknown|AuthenticAMD|GenuineIntel)/,/esac/{
+  /x86_64|amd64)/a\
+           aarch64|arm64)\
+             SYSTEM_ARCH="aarch64";;
+  /i?86)/a\
+           aarch64|arm64)\
+             SYSTEM_ARCH="aarch64";;
+}' "$CACHEDIR/functions.sh"
 
 # Download ARM64 appimagetool
 download_if_not_exist "$CACHEDIR/appimagetool" "https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-aarch64.AppImage"
@@ -116,7 +107,7 @@ cp -fp "$CONTRIB/build-linux/appimage/scripts/python.sh" "$APPDIR/python" || fai
 info "Finalizing AppDir"
 (
     export PKG2AICOMMIT="$PKG2APPIMAGE_COMMIT"
-    export ARCH=aarch64  # Add this line to explicitly set the architecture
+    export ARCH=arm_aarch64  # Use the correct ARCH value for ARM64
     . "$CACHEDIR/functions.sh"
 
     cd "$APPDIR"
