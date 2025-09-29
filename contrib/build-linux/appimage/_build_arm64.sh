@@ -124,13 +124,26 @@ CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-b
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-binary :all: --cache-dir "$CACHEDIR/pip_cache" -r "$CONTRIB/deterministic-build/requirements-build-appimage.txt"
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-binary :all: --cache-dir "$CACHEDIR/pip_cache" -r "$CONTRIB/deterministic-build/requirements.txt"
 
-# Install PyQt5 - try without --only-binary restriction first
-info "Installing PyQt5 for ARM64"
-# Install system Qt5 development packages first
-apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia qt5-default qttools5-dev-tools
+# Install PyQt5 system packages and copy to AppImage (avoid memory-intensive source build)
+info "Installing PyQt5 system packages for ARM64"
+apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia
 
-# Try to install PyQt5 without binary restriction
-CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" PyQt5==5.15.9
+# Copy system PyQt5 packages to AppImage
+info "Copying system PyQt5 packages to AppImage"
+cp -r /usr/lib/python3/dist-packages/PyQt5* "$PYDIR/site-packages/" || fail "Could not copy PyQt5"
+cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could not copy sip"
+
+# Copy Qt5 libraries
+mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
+cp -r /usr/lib/aarch64-linux-gnu/libQt5* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5 libraries"
+cp -r /usr/lib/aarch64-linux-gnu/libq* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5 libraries"
+
+# Copy Qt5 plugins
+mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins"
+cp -r /usr/lib/aarch64-linux-gnu/qt5/plugins/* "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins/" || fail "Could not copy Qt5 plugins"
+
+# Skip PyQt5 pip installation entirely - we're using system packages
+# CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" PyQt5==5.15.9
 
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" "$PROJECT_ROOT"
 
