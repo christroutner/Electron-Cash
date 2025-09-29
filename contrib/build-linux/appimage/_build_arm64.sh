@@ -124,8 +124,13 @@ CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-b
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-binary :all: --cache-dir "$CACHEDIR/pip_cache" -r "$CONTRIB/deterministic-build/requirements-build-appimage.txt"
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-binary :all: --cache-dir "$CACHEDIR/pip_cache" -r "$CONTRIB/deterministic-build/requirements.txt"
 
-# Install PyQt5 as binary packages (same as x86_64 build)
-CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-binary :all: --only-binary PyQt5,PyQt5-Qt5 --cache-dir "$CACHEDIR/pip_cache" -r "$CONTRIB/deterministic-build/requirements-binaries.txt"
+# Install PyQt5 - try without --only-binary restriction first
+info "Installing PyQt5 for ARM64"
+# Install system Qt5 development packages first
+apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia qt5-default qttools5-dev-tools
+
+# Try to install PyQt5 without binary restriction
+CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" PyQt5==5.15.9
 
 CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" "$PROJECT_ROOT"
 
