@@ -2,7 +2,15 @@
 
 This new README contains step-by-step instructions for install Electron Cash on a Raspberry Pi (arm64 architecture) running Ubuntu 22.04.
 
-# Electron Cash - Build Instructions for Ubuntu 22.04 on Raspberry Pi
+## AppImage
+
+To run the AppImage, you need to ensure the following dependencies are installed:
+
+```bash
+sudo apt install libfuse2 python3-pyqt5
+```
+
+## Electron Cash - Build Instructions for Ubuntu 22.04 on Raspberry Pi
 
 This guide provides step-by-step instructions for building Electron Cash from source on Ubuntu 22.04 running on Raspberry Pi (ARM64 architecture).
 
