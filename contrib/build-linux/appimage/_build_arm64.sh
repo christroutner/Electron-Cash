@@ -142,6 +142,40 @@ cp -r /usr/lib/aarch64-linux-gnu/libq* "$APPDIR/usr/lib/aarch64-linux-gnu/" || f
 mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins"
 cp -r /usr/lib/aarch64-linux-gnu/qt5/plugins/* "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins/" || fail "Could not copy Qt5 plugins"
 
+# Copy all required system libraries using ldd
+info "Copying all required system libraries"
+mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
+
+# Find all shared libraries needed by PyQt5 and copy them
+for lib in /usr/lib/aarch64-linux-gnu/libQt5*.so*; do
+    if [ -f "$lib" ]; then
+        cp "$lib" "$APPDIR/usr/lib/aarch64-linux-gnu/" || true
+        # Get all dependencies of this library
+        ldd "$lib" 2>/dev/null | grep "=> /usr/lib/aarch64-linux-gnu/" | awk '{print $3}' | while read dep; do
+            if [ -f "$dep" ]; then
+                cp "$dep" "$APPDIR/usr/lib/aarch64-linux-gnu/" || true
+            fi
+        done
+    fi
+done
+
+# Also copy libraries needed by Python
+for lib in /usr/lib/aarch64-linux-gnu/libpython3.11.so*; do
+    if [ -f "$lib" ]; then
+        cp "$lib" "$APPDIR/usr/lib/aarch64-linux-gnu/" || true
+        ldd "$lib" 2>/dev/null | grep "=> /usr/lib/aarch64-linux-gnu/" | awk '{print $3}' | while read dep; do
+            if [ -f "$dep" ]; then
+                cp "$dep" "$APPDIR/usr/lib/aarch64-linux-gnu/" || true
+            fi
+        done
+    fi
+done
+
+# Copy specific libraries that are commonly needed
+cp /usr/lib/aarch64-linux-gnu/libusb-1.0.so "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+cp /usr/lib/aarch64-linux-gnu/libxkbcommon-x11.so.0 "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+cp /usr/lib/aarch64-linux-gnu/libxcb* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+
 # Skip PyQt5 pip installation entirely - we're using system packages
 # CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" PyQt5==5.15.9
 
