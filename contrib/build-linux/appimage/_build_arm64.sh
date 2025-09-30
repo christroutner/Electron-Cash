@@ -126,7 +126,34 @@ CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-b
 
 # Install PyQt5 system packages and copy to AppImage (avoid memory-intensive source build)
 info "Installing PyQt5 system packages for ARM64"
-apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia python3-sip
+apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia python3-sip python3-sip-dev
+
+# Try to install PyQt5 via pip with specific flags to avoid source compilation
+info "Installing PyQt5 via pip with system packages"
+# First, try to install PyQt5 with --find-links to use system packages
+CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" --find-links /usr/lib/python3/dist-packages PyQt5==5.15.9 || {
+    info "PyQt5 pip installation failed, using system packages only"
+    # Copy system PyQt5 packages to AppImage
+    cp -r /usr/lib/python3/dist-packages/PyQt5* "$PYDIR/site-packages/" || fail "Could not copy PyQt5"
+    cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could not copy sip"
+    
+    # Also copy from site-packages if it exists there
+    cp -r /usr/local/lib/python3.11/dist-packages/PyQt5* "$PYDIR/site-packages/" 2>/dev/null || true
+    cp -r /usr/local/lib/python3.11/dist-packages/sip* "$PYDIR/site-packages/" 2>/dev/null || true
+    
+    # Copy sip shared libraries
+    cp /usr/lib/aarch64-linux-gnu/libsip.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+}
+
+# Verify that sip is properly installed
+info "Verifying sip installation"
+if [ ! -d "$PYDIR/site-packages/sip" ]; then
+    fail "sip module not found in site-packages"
+fi
+
+# Create a simple test to verify PyQt5 can import sip
+info "Testing PyQt5 sip import"
+"$python" -c "import sip; print('sip imported successfully')" || fail "sip import test failed"
 
 # Copy system PyQt5 packages to AppImage
 info "Copying system PyQt5 packages to AppImage"
