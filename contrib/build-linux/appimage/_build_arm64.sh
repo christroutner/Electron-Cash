@@ -126,12 +126,19 @@ CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-b
 
 # Install PyQt5 system packages and copy to AppImage (avoid memory-intensive source build)
 info "Installing PyQt5 system packages for ARM64"
-apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia
+apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia python3-sip
 
 # Copy system PyQt5 packages to AppImage
 info "Copying system PyQt5 packages to AppImage"
 cp -r /usr/lib/python3/dist-packages/PyQt5* "$PYDIR/site-packages/" || fail "Could not copy PyQt5"
 cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could not copy sip"
+
+# Also copy from site-packages if it exists there
+cp -r /usr/local/lib/python3.11/dist-packages/PyQt5* "$PYDIR/site-packages/" 2>/dev/null || true
+cp -r /usr/local/lib/python3.11/dist-packages/sip* "$PYDIR/site-packages/" 2>/dev/null || true
+
+# Copy sip shared libraries
+cp /usr/lib/aarch64-linux-gnu/libsip.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
 
 # Copy Qt5 libraries
 mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
