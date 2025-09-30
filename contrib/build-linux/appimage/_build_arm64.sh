@@ -128,26 +128,44 @@ CFLAGS="-g0" "$python" -m pip install --no-deps --no-warn-script-location --no-b
 info "Installing PyQt5 system packages for ARM64"
 apt-get update && apt-get install -y python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtmultimedia python3-sip python3-sip-dev
 
-# Try to install PyQt5 via pip with specific flags to avoid source compilation
-info "Installing PyQt5 via pip with system packages"
-# First, try to install PyQt5 with --find-links to use system packages
-CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" --find-links /usr/lib/python3/dist-packages PyQt5==5.15.9 || {
-    info "PyQt5 pip installation failed, using system packages only"
-    # Copy system PyQt5 packages to AppImage
-    cp -r /usr/lib/python3/dist-packages/PyQt5* "$PYDIR/site-packages/" || fail "Could not copy PyQt5"
-    cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could not copy sip"
-    
-    # Also copy from site-packages if it exists there
-    cp -r /usr/local/lib/python3.11/dist-packages/PyQt5* "$PYDIR/site-packages/" 2>/dev/null || true
-    cp -r /usr/local/lib/python3.11/dist-packages/sip* "$PYDIR/site-packages/" 2>/dev/null || true
-    
-    # Copy sip shared libraries
-    cp /usr/lib/aarch64-linux-gnu/libsip.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
-}
+# Debug: Check what's actually installed
+info "Checking installed PyQt5 and sip packages"
+find /usr -name "*PyQt5*" -type d 2>/dev/null | head -10
+find /usr -name "*sip*" -type d 2>/dev/null | head -10
+find /usr -name "sipconfig.py" 2>/dev/null | head -5
+
+# Copy system PyQt5 packages to AppImage
+info "Copying system PyQt5 packages to AppImage"
+# Try multiple possible locations
+for pyqt5_dir in /usr/lib/python3/dist-packages/PyQt5* /usr/local/lib/python3.11/dist-packages/PyQt5*; do
+    if [ -d "$pyqt5_dir" ]; then
+        cp -r "$pyqt5_dir" "$PYDIR/site-packages/" || fail "Could not copy PyQt5 from $pyqt5_dir"
+        info "Copied PyQt5 from $pyqt5_dir"
+    fi
+done
+
+# Copy sip packages from multiple possible locations
+info "Copying sip packages to AppImage"
+for sip_dir in /usr/lib/python3/dist-packages/sip* /usr/local/lib/python3.11/dist-packages/sip*; do
+    if [ -d "$sip_dir" ]; then
+        cp -r "$sip_dir" "$PYDIR/site-packages/" || fail "Could not copy sip from $sip_dir"
+        info "Copied sip from $sip_dir"
+    fi
+done
+
+# Copy sip shared libraries
+cp /usr/lib/aarch64-linux-gnu/libsip.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+
+# Also copy sip from other possible locations
+cp -r /usr/share/pyshared/sip* "$PYDIR/site-packages/" 2>/dev/null || true
+cp -r /usr/lib/python3/dist-packages/sipconfig.py "$PYDIR/site-packages/" 2>/dev/null || true
+cp -r /usr/lib/python3/dist-packages/sipdistutils.py "$PYDIR/site-packages/" 2>/dev/null || true
 
 # Verify that sip is properly installed
 info "Verifying sip installation"
 if [ ! -d "$PYDIR/site-packages/sip" ]; then
+    info "sip module not found, checking what was copied"
+    ls -la "$PYDIR/site-packages/" | grep -i sip
     fail "sip module not found in site-packages"
 fi
 
