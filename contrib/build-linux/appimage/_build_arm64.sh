@@ -161,6 +161,23 @@ cp -r /usr/share/pyshared/sip* "$PYDIR/site-packages/" 2>/dev/null || true
 cp -r /usr/lib/python3/dist-packages/sipconfig.py "$PYDIR/site-packages/" 2>/dev/null || true
 cp -r /usr/lib/python3/dist-packages/sipdistutils.py "$PYDIR/site-packages/" 2>/dev/null || true
 
+# Handle PyQt5_sip case - create a sip module if it doesn't exist
+if [ ! -d "$PYDIR/site-packages/sip" ] && [ -d "$PYDIR/site-packages/PyQt5_sip-12.9.1.egg-info" ]; then
+    info "Creating sip module from PyQt5_sip"
+    mkdir -p "$PYDIR/site-packages/sip"
+    # Copy PyQt5_sip as sip
+    cp -r /usr/lib/python3/dist-packages/PyQt5_sip* "$PYDIR/site-packages/sip/" 2>/dev/null || true
+    # Create a simple sip module init file
+    cat > "$PYDIR/site-packages/sip/__init__.py" << 'EOF'
+# sip module compatibility layer
+try:
+    from PyQt5.sip import *
+except ImportError:
+    # Fallback for older sip versions
+    import sip
+EOF
+fi
+
 # Verify that sip is properly installed
 info "Verifying sip installation"
 if [ ! -d "$PYDIR/site-packages/sip" ]; then
@@ -171,7 +188,10 @@ fi
 
 # Create a simple test to verify PyQt5 can import sip
 info "Testing PyQt5 sip import"
-"$python" -c "import sip; print('sip imported successfully')" || fail "sip import test failed"
+"$python" -c "import sip; print('sip imported successfully')" || {
+    info "sip import failed, trying PyQt5.sip"
+    "$python" -c "from PyQt5.sip import *; print('PyQt5.sip imported successfully')" || fail "Both sip and PyQt5.sip import failed"
+}
 
 # Copy system PyQt5 packages to AppImage
 info "Copying system PyQt5 packages to AppImage"
