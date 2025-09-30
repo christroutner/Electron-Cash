@@ -178,6 +178,48 @@ except ImportError:
 EOF
 fi
 
+# Create PyQt5.sip module if it doesn't exist
+if [ ! -f "$PYDIR/site-packages/PyQt5/sip.py" ] && [ ! -d "$PYDIR/site-packages/PyQt5/sip" ]; then
+    info "Creating PyQt5.sip module"
+    # Check if PyQt5 directory exists
+    if [ -d "$PYDIR/site-packages/PyQt5" ]; then
+        # Copy the PyQt5.sip module from the .so file
+        if [ -f "/usr/lib/python3/dist-packages/PyQt5/sip.cpython-311-aarch64-linux-gnu.so" ]; then
+            cp "/usr/lib/python3/dist-packages/PyQt5/sip.cpython-311-aarch64-linux-gnu.so" "$PYDIR/site-packages/PyQt5/" || fail "Could not copy PyQt5.sip.so"
+            info "Copied PyQt5.sip.so"
+        else
+            # Create a compatibility wrapper
+            cat > "$PYDIR/site-packages/PyQt5/sip.py" << 'EOF'
+# PyQt5.sip compatibility layer
+# This module provides compatibility between different PyQt5/sip versions
+import sys
+
+# Try to import the actual sip implementation
+try:
+    # Try PyQt5._sip first (newer versions)
+    from PyQt5 import _sip
+    # Export all symbols from _sip
+    for attr in dir(_sip):
+        if not attr.startswith('_'):
+            setattr(sys.modules[__name__], attr, getattr(_sip, attr))
+except ImportError:
+    try:
+        # Try the standalone sip module
+        import sip as _sip_module
+        # Export all symbols from sip
+        for attr in dir(_sip_module):
+            if not attr.startswith('_'):
+                setattr(sys.modules[__name__], attr, getattr(_sip_module, attr))
+    except ImportError:
+        raise ImportError("Could not find sip implementation")
+EOF
+            info "Created PyQt5.sip compatibility wrapper"
+        fi
+    else
+        fail "PyQt5 directory not found"
+    fi
+fi
+
 # Verify that sip is properly installed
 info "Verifying sip installation"
 if [ ! -d "$PYDIR/site-packages/sip" ]; then
@@ -192,6 +234,10 @@ info "Testing PyQt5 sip import"
     info "sip import failed, trying PyQt5.sip"
     "$python" -c "from PyQt5.sip import *; print('PyQt5.sip imported successfully')" || fail "Both sip and PyQt5.sip import failed"
 }
+
+# Test PyQt5.sip specifically
+info "Testing PyQt5.sip import specifically"
+"$python" -c "from PyQt5 import sip; print('PyQt5.sip imported successfully via from PyQt5 import sip')" || fail "PyQt5.sip import test failed"
 
 # Copy system PyQt5 packages to AppImage
 info "Copying system PyQt5 packages to AppImage"
