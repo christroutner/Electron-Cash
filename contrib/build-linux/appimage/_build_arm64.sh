@@ -137,69 +137,55 @@ cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could
 cp -r /usr/local/lib/python3.11/dist-packages/PyQt5* "$PYDIR/site-packages/" 2>/dev/null || true
 cp -r /usr/local/lib/python3.11/dist-packages/sip* "$PYDIR/site-packages/" 2>/dev/null || true
 
-# Copy sip shared libraries
-cp /usr/lib/aarch64-linux-gnu/libsip.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
-
-# Copy Qt5 libraries
-mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
-cp -r /usr/lib/aarch64-linux-gnu/libQt5* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5 libraries"
-cp -r /usr/lib/aarch64-linux-gnu/libq* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5 libraries"
-
-# Copy Qt5 plugins
-mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins"
-cp -r /usr/lib/aarch64-linux-gnu/qt5/plugins/* "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins/" || fail "Could not copy Qt5 plugins"
-
-# Copy all required system libraries - more comprehensive approach
-info "Copying all required system libraries"
+# Copy only the essential Qt5 libraries, not all system libraries
+info "Copying only essential Qt5 libraries"
 mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
 
-# Copy ICU libraries specifically (this was the missing piece)
-cp /usr/lib/aarch64-linux-gnu/libicu* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy ICU libraries"
+# Copy only the specific Qt5 libraries needed
+cp /usr/lib/aarch64-linux-gnu/libQt5Core.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Core"
+cp /usr/lib/aarch64-linux-gnu/libQt5Gui.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Gui"
+cp /usr/lib/aarch64-linux-gnu/libQt5Widgets.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Widgets"
+cp /usr/lib/aarch64-linux-gnu/libQt5Svg.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Svg"
+cp /usr/lib/aarch64-linux-gnu/libQt5Multimedia.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Multimedia"
 
-# Copy all Qt5 libraries
-cp /usr/lib/aarch64-linux-gnu/libQt5* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5 libraries"
+# Copy only essential supporting libraries
+cp /usr/lib/aarch64-linux-gnu/libicu*.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy ICU libraries"
+cp /usr/lib/aarch64-linux-gnu/libfreetype.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FreeType libraries"
+cp /usr/lib/aarch64-linux-gnu/libfontconfig.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FontConfig libraries"
+cp /usr/lib/aarch64-linux-gnu/libharfbuzz.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy HarfBuzz libraries"
+cp /usr/lib/aarch64-linux-gnu/libpng16.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PNG libraries"
 
-# Copy all GLib libraries
-cp /usr/lib/aarch64-linux-gnu/libglib* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GLib libraries"
-cp /usr/lib/aarch64-linux-gnu/libgobject* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GObject libraries"
-cp /usr/lib/aarch64-linux-gnu/libgio* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GIO libraries"
-cp /usr/lib/aarch64-linux-gnu/libgmodule* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GModule libraries"
-cp /usr/lib/aarch64-linux-gnu/libgthread* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GThread libraries"
+# Copy only essential X11 libraries
+cp /usr/lib/aarch64-linux-gnu/libX11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy X11 libraries"
+cp /usr/lib/aarch64-linux-gnu/libXext.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xext libraries"
+cp /usr/lib/aarch64-linux-gnu/libXrender.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrender libraries"
+cp /usr/lib/aarch64-linux-gnu/libXrandr.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrandr libraries"
+cp /usr/lib/aarch64-linux-gnu/libXinerama.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xinerama libraries"
+cp /usr/lib/aarch64-linux-gnu/libXcursor.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcursor libraries"
+cp /usr/lib/aarch64-linux-gnu/libXi.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xi libraries"
+cp /usr/lib/aarch64-linux-gnu/libXfixes.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xfixes libraries"
+cp /usr/lib/aarch64-linux-gnu/libXdamage.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xdamage libraries"
+cp /usr/lib/aarch64-linux-gnu/libXcomposite.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcomposite libraries"
 
-# Copy font and graphics libraries
-cp /usr/lib/aarch64-linux-gnu/libfreetype* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FreeType libraries"
-cp /usr/lib/aarch64-linux-gnu/libfontconfig* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FontConfig libraries"
-cp /usr/lib/aarch64-linux-gnu/libharfbuzz* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy HarfBuzz libraries"
-cp /usr/lib/aarch64-linux-gnu/libpng* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PNG libraries"
-cp /usr/lib/aarch64-linux-gnu/libjpeg* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy JPEG libraries"
+# Copy only essential GLib libraries
+cp /usr/lib/aarch64-linux-gnu/libglib-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GLib libraries"
+cp /usr/lib/aarch64-linux-gnu/libgobject-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GObject libraries"
+cp /usr/lib/aarch64-linux-gnu/libgio-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GIO libraries"
+cp /usr/lib/aarch64-linux-gnu/libgmodule-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GModule libraries"
+cp /usr/lib/aarch64-linux-gnu/libgthread-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GThread libraries"
 
-# Copy X11 libraries
-cp /usr/lib/aarch64-linux-gnu/libX11* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy X11 libraries"
-cp /usr/lib/aarch64-linux-gnu/libXext* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xext libraries"
-cp /usr/lib/aarch64-linux-gnu/libXrender* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrender libraries"
-cp /usr/lib/aarch64-linux-gnu/libXrandr* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrandr libraries"
-cp /usr/lib/aarch64-linux-gnu/libXinerama* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xinerama libraries"
-cp /usr/lib/aarch64-linux-gnu/libXcursor* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcursor libraries"
-cp /usr/lib/aarch64-linux-gnu/libXi* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xi libraries"
-cp /usr/lib/aarch64-linux-gnu/libXfixes* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xfixes libraries"
-cp /usr/lib/aarch64-linux-gnu/libXdamage* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xdamage libraries"
-cp /usr/lib/aarch64-linux-gnu/libXcomposite* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcomposite libraries"
-
-# Copy OpenGL libraries
-cp /usr/lib/aarch64-linux-gnu/libGL* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy OpenGL libraries"
-cp /usr/lib/aarch64-linux-gnu/libEGL* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy EGL libraries"
-cp /usr/lib/aarch64-linux-gnu/libgbm* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GBM libraries"
-
-# Copy other essential libraries
-cp /usr/lib/aarch64-linux-gnu/libpthread* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy pthread libraries"
-cp /usr/lib/aarch64-linux-gnu/libdl* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy dl libraries"
-cp /usr/lib/aarch64-linux-gnu/libm* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy math libraries"
-cp /usr/lib/aarch64-linux-gnu/libc* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy C libraries"
+# Copy only essential OpenGL libraries
+cp /usr/lib/aarch64-linux-gnu/libGL.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy OpenGL libraries"
+cp /usr/lib/aarch64-linux-gnu/libEGL.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy EGL libraries"
+cp /usr/lib/aarch64-linux-gnu/libgbm.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GBM libraries"
 
 # Copy specific libraries that are commonly needed
-cp /usr/lib/aarch64-linux-gnu/libusb-1.0.so "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libusb"
-cp /usr/lib/aarch64-linux-gnu/libxkbcommon-x11.so.0 "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxkbcommon-x11"
-cp /usr/lib/aarch64-linux-gnu/libxcb* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxcb libraries"
+cp /usr/lib/aarch64-linux-gnu/libusb-1.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libusb"
+cp /usr/lib/aarch64-linux-gnu/libxkbcommon-x11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxkbcommon-x11"
+cp /usr/lib/aarch64-linux-gnu/libxcb*.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxcb libraries"
+
+# DO NOT copy system libraries like libc, libm, libpthread, libdl, libgcc, etc.
+# These should come from the host system to avoid compatibility issues
 
 # Skip PyQt5 pip installation entirely - we're using system packages
 # CFLAGS="-g0" "$python" -m pip install --no-warn-script-location --cache-dir "$CACHEDIR/pip_cache" PyQt5==5.15.9
