@@ -155,6 +155,9 @@ cp /usr/lib/aarch64-linux-gnu/libfontconfig.so* "$APPDIR/usr/lib/aarch64-linux-g
 cp /usr/lib/aarch64-linux-gnu/libharfbuzz.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy HarfBuzz libraries"
 cp /usr/lib/aarch64-linux-gnu/libpng16.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PNG libraries"
 
+# Copy PCRE library (needed by Qt5)
+cp /usr/lib/aarch64-linux-gnu/libpcre.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PCRE libraries"
+
 # Copy only essential X11 libraries
 cp /usr/lib/aarch64-linux-gnu/libX11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy X11 libraries"
 cp /usr/lib/aarch64-linux-gnu/libXext.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xext libraries"
