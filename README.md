@@ -1,13 +1,21 @@
 # Electron Cash
 
-This new README contains step-by-step instructions for install Electron Cash on a Raspberry Pi (arm64 architecture) running Ubuntu 22.04.
+This new README contains step-by-step instructions for install Electron Cash on a Raspberry Pi (arm64 architecture) running Ubuntu 24.04. It targets the arm64 architecture of a Pi 4 or 5.
 
 ## AppImage
 
 To run the AppImage, you need to ensure the following dependencies are installed:
 
 ```bash
-sudo apt install libfuse2 python3-pyqt5
+sudo apt update
+sudo apt upgrade -y
+sudo apt install libfuse2 python3-pyqt5 zlib1g-dev
+```
+
+After that, you should be able to successfully run the Electron Cash AppImage:
+
+```bash
+./electron-cash-4.2.3-arm64.AppImage
 ```
 
 ## Electron Cash - Build Instructions for Ubuntu 22.04 on Raspberry Pi
@@ -97,6 +105,17 @@ git submodule update --init --recursive
 pip3 install --user --upgrade pip setuptools wheel
 ```
 
+If Ubuntu gives you the following error:
+- `error: externally-managed-environment`
+
+Turn off the externally managed setting with the following command:
+- `sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED`
+
+Then try running the command again, and it should complete:
+```bash
+pip3 install --user --upgrade pip setuptools wheel
+```
+
 ### 7. Install Core Python Dependencies
 ```bash
 pip3 install --user -r contrib/requirements/requirements.txt
@@ -127,12 +146,10 @@ pip3 install --user zxing-cpp>=2.3.0
 
 ### 11. Build libsecp256k1 (Highly Recommended)
 ```bash
-# If you encounter libtool issues, clean and rebuild
 cd contrib/secp256k1
 ./autogen.sh
 cd ../..
 
-# Build libsecp256k1
 ./contrib/make_secp
 ```
 
@@ -159,28 +176,22 @@ sudo apt install -y pyqt5-dev-tools
 pyrcc5 icons.qrc -o electroncash_gui/qt/icons.py
 ```
 
+### 15. Install Tor for use with Cash Fusion
+Tor will be needed in order to run Cash Fusion.
+
+```bash
+sudo apt install tor
+```
+
 ## Testing and Running
 
-### 15. Test Electron Cash Installation
+### 16. Test Electron Cash Installation
 ```bash
 # Test command line mode first
 python3 ./electron-cash --help
 
 # Test GUI mode
 python3 ./electron-cash
-```
-
-### 16. Create Desktop Integration (Optional)
-```bash
-# Make the script executable
-chmod +x electron-cash
-
-# Install system-wide (optional)
-sudo python3 setup.py install
-```
-### 17. Install Tor for use with Cash Fusion
-```bash
-sudo apt install tor
 ```
 
 ## Build AppImage
