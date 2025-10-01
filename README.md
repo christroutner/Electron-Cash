@@ -18,11 +18,11 @@ After that, you should be able to successfully run the Electron Cash AppImage:
 ./electron-cash-4.2.3-arm64.AppImage
 ```
 
-## Electron Cash - Build Instructions for Ubuntu 22.04 on Raspberry Pi
+## Electron Cash - Build Instructions for Ubuntu 24.04 on Raspberry Pi
 
-This guide provides step-by-step instructions for building Electron Cash from source on Ubuntu 22.04 running on Raspberry Pi (ARM64 architecture).
+This guide provides step-by-step instructions for building Electron Cash from source on Ubuntu 24.04 running on Raspberry Pi (ARM64 architecture).
 
-These steps have been tested on a Raspberry Pi 4 B with 4GB of memory and a 32GB SD card. *These should be considered minimal requirements*.
+These steps have been tested on a Raspberry Pi 4 B with 8GB of memory and a 32GB SD card. *These should be considered minimal requirements*.
 
 ## Prerequisites and System Setup
 
