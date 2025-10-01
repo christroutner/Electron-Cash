@@ -249,57 +249,21 @@ cp -r /usr/lib/python3/dist-packages/sip* "$PYDIR/site-packages/" || fail "Could
 cp -r /usr/local/lib/python3.11/dist-packages/PyQt5* "$PYDIR/site-packages/" 2>/dev/null || true
 cp -r /usr/local/lib/python3.11/dist-packages/sip* "$PYDIR/site-packages/" 2>/dev/null || true
 
-# Copy only the essential Qt5 libraries, not all system libraries
-info "Copying only essential Qt5 libraries"
+# Copy Qt5 plugins (but not Qt5 libraries to avoid version mismatch)
+info "Copying Qt5 plugins only (not libraries)"
+mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins"
+cp -r /usr/lib/aarch64-linux-gnu/qt5/plugins/* "$APPDIR/usr/lib/aarch64-linux-gnu/qt5/plugins/" 2>/dev/null || fail "Could not copy Qt5 plugins"
+
+# DO NOT copy Qt5 libraries - use system libraries to avoid version mismatch
+info "Skipping Qt5 library copying to avoid version mismatch - relying on system Qt5"
+
+# Copy only absolutely essential libraries that may not be on all systems
 mkdir -p "$APPDIR/usr/lib/aarch64-linux-gnu"
+cp /usr/lib/aarch64-linux-gnu/libusb-1.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+cp /usr/lib/aarch64-linux-gnu/libxkbcommon-x11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
+cp /usr/lib/aarch64-linux-gnu/libxcb*.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" 2>/dev/null || true
 
-# Copy only the specific Qt5 libraries needed
-cp /usr/lib/aarch64-linux-gnu/libQt5Core.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Core"
-cp /usr/lib/aarch64-linux-gnu/libQt5Gui.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Gui"
-cp /usr/lib/aarch64-linux-gnu/libQt5Widgets.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Widgets"
-cp /usr/lib/aarch64-linux-gnu/libQt5Svg.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Svg"
-cp /usr/lib/aarch64-linux-gnu/libQt5Multimedia.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Qt5Multimedia"
-
-# Copy only essential supporting libraries
-cp /usr/lib/aarch64-linux-gnu/libicu*.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy ICU libraries"
-cp /usr/lib/aarch64-linux-gnu/libfreetype.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FreeType libraries"
-cp /usr/lib/aarch64-linux-gnu/libfontconfig.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy FontConfig libraries"
-cp /usr/lib/aarch64-linux-gnu/libharfbuzz.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy HarfBuzz libraries"
-cp /usr/lib/aarch64-linux-gnu/libpng16.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PNG libraries"
-
-# Copy PCRE library (needed by Qt5)
-cp /usr/lib/aarch64-linux-gnu/libpcre.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy PCRE libraries"
-
-# Copy only essential X11 libraries
-cp /usr/lib/aarch64-linux-gnu/libX11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy X11 libraries"
-cp /usr/lib/aarch64-linux-gnu/libXext.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xext libraries"
-cp /usr/lib/aarch64-linux-gnu/libXrender.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrender libraries"
-cp /usr/lib/aarch64-linux-gnu/libXrandr.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xrandr libraries"
-cp /usr/lib/aarch64-linux-gnu/libXinerama.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xinerama libraries"
-cp /usr/lib/aarch64-linux-gnu/libXcursor.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcursor libraries"
-cp /usr/lib/aarch64-linux-gnu/libXi.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xi libraries"
-cp /usr/lib/aarch64-linux-gnu/libXfixes.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xfixes libraries"
-cp /usr/lib/aarch64-linux-gnu/libXdamage.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xdamage libraries"
-cp /usr/lib/aarch64-linux-gnu/libXcomposite.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy Xcomposite libraries"
-
-# Copy only essential GLib libraries
-cp /usr/lib/aarch64-linux-gnu/libglib-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GLib libraries"
-cp /usr/lib/aarch64-linux-gnu/libgobject-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GObject libraries"
-cp /usr/lib/aarch64-linux-gnu/libgio-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GIO libraries"
-cp /usr/lib/aarch64-linux-gnu/libgmodule-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GModule libraries"
-cp /usr/lib/aarch64-linux-gnu/libgthread-2.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GThread libraries"
-
-# Copy only essential OpenGL libraries
-cp /usr/lib/aarch64-linux-gnu/libGL.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy OpenGL libraries"
-cp /usr/lib/aarch64-linux-gnu/libEGL.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy EGL libraries"
-cp /usr/lib/aarch64-linux-gnu/libgbm.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy GBM libraries"
-
-# Copy specific libraries that are commonly needed
-cp /usr/lib/aarch64-linux-gnu/libusb-1.0.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libusb"
-cp /usr/lib/aarch64-linux-gnu/libxkbcommon-x11.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxkbcommon-x11"
-cp /usr/lib/aarch64-linux-gnu/libxcb*.so* "$APPDIR/usr/lib/aarch64-linux-gnu/" || fail "Could not copy libxcb libraries"
-
-# DO NOT copy system libraries like libc, libm, libpthread, libdl, libgcc, etc.
+# DO NOT copy system libraries like libc, libm, libpthread, libdl, libgcc, libQt5*, etc.
 # These should come from the host system to avoid compatibility issues
 
 # Skip PyQt5 pip installation entirely - we're using system packages
@@ -314,9 +278,13 @@ cp -fp "$PROJECT_ROOT/icons/electron-cash.png" "$APPDIR/electron-cash.png"
 
 # Add launcher
 info "Adding launcher"
-cp -fp "$CONTRIB/build-linux/appimage/common_arm64.sh" "$APPDIR/common.sh" || fail "Could not copy python script"
+cp -fp "$CONTRIB/build-linux/appimage/common_arm64.sh" "$APPDIR/common.sh" 2>/dev/null || cp -fp "$CONTRIB/build-linux/appimage/scripts/common.sh" "$APPDIR/common.sh" || fail "Could not copy common script"
 cp -fp "$CONTRIB/build-linux/appimage/scripts/apprun.sh" "$APPDIR/AppRun" || fail "Could not copy AppRun script"
 cp -fp "$CONTRIB/build-linux/appimage/scripts/python.sh" "$APPDIR/python" || fail "Could not copy python script"
+
+# Modify AppRun to prefer system Qt libraries
+info "Modifying AppRun to use system Qt libraries"
+sed -i 's|export LD_LIBRARY_PATH|# Prefer system Qt libraries\nexport LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH\n# export LD_LIBRARY_PATH|' "$APPDIR/AppRun" || true
 
 info "Finalizing AppDir"
 (
